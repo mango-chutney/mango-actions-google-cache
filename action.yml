@@ -1,10 +1,25 @@
-name: 'Node 12 Template Action'
-description: 'Get started with Node actions'
-author: 'GitHub'
-inputs: 
-  myInput:
-    description: 'Input to use'
-    default: 'world'
+name: 'Google Cache'
+description: 'Store and restore cache files using google cloud storage'
+author: 'Mango Chutney'
+inputs:
+  type:
+    description: 'Type of action to complete, restore or save'
+    default: ''
+  bucket:
+    description: 'Bucket to be used to store or search for cache files'
+    default: ''
+  key:
+    description: 'Key to identify the cache file'
+    default: ''
+  files:
+    description: 'List of files to be cached'
+    default: ''
+  directory:
+    descripton: 'Directory of downloaded cache'
+    default: ''
+  overwrite:
+    description: 'If to overwrite if cache already exists'
+    default: 'true'
 runs:
   using: 'node12'
   main: 'lib/main.js'

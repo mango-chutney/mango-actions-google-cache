@@ -1,9 +1,15 @@
-# JavaScript Action Template
+# Google Cache
 
-This template offers an easy way to get started writing a javascript action with TypeScript compile time support, unit testing with Jest and using the GitHub Actions Toolkit.
+A simple action to download caches or upload cahces to google cloud storage
 
-## Getting Started
+## Options
 
-See the walkthrough located [here](https://github.com/actions/toolkit/blob/master/docs/javascript-action.md).
+`type`: Type of action to perform `restore` or `save`
+`bucket`: Bucket to be used to store and search for cache files.
+`key`: The cache key used to identify the cache file to restore.
 
-In addition to walking your through how to create an action, it also provides strategies for versioning, releasing and referencing your actions.
+### Example
+
+```
+- use:
+```
