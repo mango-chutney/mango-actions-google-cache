@@ -11,21 +11,21 @@ const save_cache = async (
     if (!overwrite) {
       try {
         const bucket_file = `${bucket}/${key}.tgz`;
-        exec.exec(`gsutil ls gs://${bucket_file}`);
+        await exec.exec(`gsutil ls gs://${bucket_file}`);
         console.log(
           'Cache file exists, exiting save_cache without over-writing cache file.',
         );
       } catch {
         console.log(`Compressing cache to ${cache_file}`);
-        exec.exec('tar', ['cpzf', cache_file, ...files, '-P']);
+        await exec.exec('tar', ['cpzf', cache_file, ...files, '-P']);
         console.log('Uploading cache to Google Cloud Storage...');
-        exec.exec(`gsutil -o cp -R ${cache_file} ${bucket}`);
+        await exec.exec(`gsutil -o cp -R ${cache_file} ${bucket}`);
       }
     } else {
       console.log(`Compressing cache to ${cache_file}`);
-      exec.exec('tar', ['cpzf', cache_file, ...files, '-P']);
+      await exec.exec('tar', ['cpzf', cache_file, ...files, '-P']);
       console.log('Uploading cache to Google Cloud Storage...');
-      exec.exec(`gsutil -o cp -R ${cache_file} ${bucket}`);
+      await exec.exec(`gsutil -o cp -R ${cache_file} ${bucket}`);
     }
   } catch (err) {
     console.log(err);

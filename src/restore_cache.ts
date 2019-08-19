@@ -7,13 +7,13 @@ const save_cache = async (bucket: string, key: string, directory: string) => {
 
     console.log(`Downloading Cache file: ${remote_cache_file}`);
 
-    exec.exec(`gsutil -q cp ${remote_cache_file} ${dir}`);
+    await exec.exec(`gsutil -q cp ${remote_cache_file} ${dir}`);
 
     const src_dir = `${dir}/${key}.tgz`;
 
     console.log(`Restoring Cache file: ${src_dir}`);
 
-    exec.exec(`tar xpzf "${src_dir}" -P`);
+    await exec.exec(`tar xpzf "${src_dir}" -P`);
   } catch (err) {
     console.log(err);
   }
