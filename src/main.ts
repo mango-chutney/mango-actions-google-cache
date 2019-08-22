@@ -15,10 +15,10 @@ async function run() {
 
     // Depending on type depends on if input is required
     if (type === 'save') {
-      const files = core.getInput('files');
+      const paths = core.getInput('paths');
       const overwrite = core.getInput('overwrite');
 
-      await save_cache(bucket, key, files, overwrite);
+      await save_cache(bucket, key, paths, overwrite);
     } else if (type === 'restore') {
       const directory = core.getInput('directory');
       console.log('key:', key);

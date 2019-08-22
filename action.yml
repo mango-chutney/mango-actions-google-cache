@@ -11,8 +11,8 @@ inputs:
   key:
     description: 'Key to identify the cache file'
     default: ''
-  files:
-    description: 'List of files to be cached'
+  paths:
+    description: 'List of paths to be archived'
     default: ''
   directory:
     descripton: 'Directory of downloaded cache'
