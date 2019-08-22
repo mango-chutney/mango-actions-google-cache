@@ -3,7 +3,7 @@ import * as exec from '@actions/exec';
 const save_cache = async (
   bucket: string,
   key: string,
-  files: string,
+  paths: string,
   overwrite: string,
 ) => {
   try {
@@ -17,15 +17,19 @@ const save_cache = async (
         );
       } catch {
         console.log(`Compressing cache to ${cache_file}`);
-        await exec.exec('tar', ['cpzf', cache_file, files, '-P']);
+        await exec.exec(`tar cpzf ${cache_file} ${paths} -P`);
         console.log('Uploading cache to Google Cloud Storage...');
-        await exec.exec(`gsutil -o cp -R ${cache_file} ${bucket}`);
+        await exec.exec(
+          `gsutil -o GSUtil:parallel_composite_upload_threshold=50M cp -r ${cache_file} gs://${bucket}`,
+        );
       }
     } else {
       console.log(`Compressing cache to ${cache_file}`);
-      await exec.exec('tar', ['cpzf', cache_file, ...files, '-P']);
+      await exec.exec(`tar cpzf ${cache_file} ${paths} -P`);
       console.log('Uploading cache to Google Cloud Storage...');
-      await exec.exec(`gsutil -o cp -R ${cache_file} ${bucket}`);
+      await exec.exec(
+        `gsutil -o GSUtil:parallel_composite_upload_threshold=50M cp -r ${cache_file} gs://${bucket}`,
+      );
     }
   } catch (err) {
     console.log(err);

@@ -7,7 +7,7 @@ const save_cache = async (bucket: string, key: string, directory: string) => {
 
     console.log(`Downloading Cache file: ${remote_cache_file}`);
 
-    await exec.exec(`gsutil -q cp ${remote_cache_file} ${dir}`);
+    await exec.exec(`gsutil -q cp gs://${remote_cache_file} ${dir}`);
 
     const src_dir = `${dir}/${key}.tgz`;
 
