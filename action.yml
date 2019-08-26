@@ -10,16 +10,19 @@ inputs:
     default: ''
   key:
     description: 'Key to identify the cache file'
-    default: ''
+    default: 'cache'
   paths:
     description: 'List of paths to be archived'
     default: ''
   directory:
     descripton: 'Directory of downloaded cache'
-    default: ''
+    default: '.'
   overwrite:
     description: 'If to overwrite if cache already exists'
-    default: 'true'
+    default: 'yes'
+  threshold:
+    description: 'Threshold of parallel composite upload'
+    default: '50'
 runs:
   using: 'node12'
   main: 'lib/main.js'

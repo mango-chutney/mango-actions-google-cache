@@ -14,7 +14,9 @@ const checksum = (
 const parseKey = async (key: string) =>
   key.replace(/\((.*?)\)/g, matched => {
     const stripBrackets = matched.replace('(', '').replace(')', '');
+
     const file = fs.readFileSync(stripBrackets, 'utf8');
+
     return checksum(file);
   });
 
