@@ -1,35 +1,68 @@
 import * as exec from '@actions/exec';
 
-const save_cache = async (
+interface SaveCacheOptions {
+  bucket: string;
+  directory: string;
+  key: string;
+  overwrite: string;
+  paths: string;
+  threshold: string;
+}
+
+const compressAndUpload = async (
   bucket: string,
-  key: string,
+  cache_file: string,
+  directory: string,
   paths: string,
-  overwrite: string,
+  threshold: string,
 ) => {
+  console.log(`Compressing cache to ${cache_file}`);
+
+  await exec.exec(`tar cpzf ${cache_file} -C ${directory} ${paths} -P`);
+
+  console.log('Uploading cache to Google Cloud Storage...');
+
+  await exec.exec(
+    `gsutil -o GSUtil:parallel_composite_upload_threshold=${threshold}M cp -r ${cache_file} gs://${bucket}`,
+  );
+};
+
+const save_cache = async ({
+  bucket,
+  directory,
+  key,
+  overwrite,
+  paths,
+  threshold,
+}: SaveCacheOptions) => {
   try {
-    const cache_file = `./${key}.tgz`;
-    if (!overwrite) {
-      try {
-        const bucket_file = `${bucket}/${key}.tgz`;
-        await exec.exec(`gsutil ls gs://${bucket_file}`);
-        console.log(
+    const cache_file = `${directory}/${key}.tgz`;
+    if (overwrite === 'no') {
+      const bucket_file = `gs://${bucket}/${key}.tgz`;
+
+      let out = '';
+
+      const options = {
+        listeners: {
+          stdout: (data: Buffer) => {
+            out += data.toString();
+          },
+        },
+      };
+
+      await exec.exec(`gsutil ls ${bucket_file}`, undefined, options);
+
+      console.log(out.trim());
+
+      if (out.trim() === bucket_file) {
+        throw new Error(
           'Cache file exists, exiting save_cache without over-writing cache file.',
         );
-      } catch {
-        console.log(`Compressing cache to ${cache_file}`);
-        await exec.exec(`tar cpzf ${cache_file} ${paths} -P`);
-        console.log('Uploading cache to Google Cloud Storage...');
-        await exec.exec(
-          `gsutil -o GSUtil:parallel_composite_upload_threshold=50M cp -r ${cache_file} gs://${bucket}`,
-        );
       }
+
+      compressAndUpload(bucket, cache_file, directory, paths, threshold);
     } else {
-      console.log(`Compressing cache to ${cache_file}`);
-      await exec.exec(`tar cpzf ${cache_file} ${paths} -P`);
-      console.log('Uploading cache to Google Cloud Storage...');
-      await exec.exec(
-        `gsutil -o GSUtil:parallel_composite_upload_threshold=50M cp -r ${cache_file} gs://${bucket}`,
-      );
+      compressAndUpload(bucket, cache_file, directory, paths, threshold);
     }
   } catch (err) {
     console.log(err);
