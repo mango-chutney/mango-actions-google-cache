@@ -12,7 +12,24 @@ const restore_cache = async ({ bucket, key, directory }: SaveCacheOptions) => {
 
     console.log(`Downloading Cache file: ${remote_cache_file}`);
 
-    await exec.exec(`gsutil -q cp ${remote_cache_file} ${directory}`);
+    let err = '';
+
+    await exec.exec(
+      `gsutil -q cp ${remote_cache_file} ${directory}`,
+      undefined,
+      {
+        listeners: {
+          stderr: (data: Buffer) => {
+            err += data.toString();
+          },
+        },
+        ignoreReturnCode: true,
+      },
+    );
+
+    if (err.includes('No URLs matched')) {
+      throw new Error('No Cache file exists in cache bucket, skipping...');
+    }
 
     const src_dir = `${directory}/${key}.tgz`;
 

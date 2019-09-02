@@ -41,18 +41,24 @@ const save_cache = async ({
       const bucket_file = `gs://${bucket}/${key}.tgz`;
 
       let out = '';
+      let err = '';
 
       const options = {
         listeners: {
           stdout: (data: Buffer) => {
             out += data.toString();
           },
+          stderr: (data: Buffer) => {
+            err += data.toString();
+          },
         },
+        ignoreReturnCode: true,
       };
 
       await exec.exec(`gsutil ls ${bucket_file}`, undefined, options);
 
       console.log(out.trim());
+      console.log(err.trim());
 
       if (out.trim() === bucket_file) {
         throw new Error(
@@ -60,7 +66,12 @@ const save_cache = async ({
         );
       }
 
-      compressAndUpload(bucket, cache_file, directory, paths, threshold);
+      if (
+        err.trim() === 'CommandException: One or more URLs matched no objects.'
+      ) {
+        console.log('Object does not exist, uploading new file');
+        compressAndUpload(bucket, cache_file, directory, paths, threshold);
+      }
     } else {
       compressAndUpload(bucket, cache_file, directory, paths, threshold);
     }
